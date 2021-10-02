@@ -7,6 +7,7 @@ const config = require('config')
 const request = require('request')
 const Profile = require('../../models/Profile')
 const User = require('../../models/User')
+const Post = require('../../models/Post')
 
 
 // @route   GET api/profile/me
@@ -17,7 +18,6 @@ router.get('/me', auth, async (req, res) => {
       const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'avatar'])
       if (!profile) {
          return res.status(400).json({ msg: 'There is no profile for this user' })
-         console.log(profile)
       }
       res.json(profile)
    } catch (err) {
@@ -110,9 +110,10 @@ router.get('/', async (req, res) => {
 })
 
 // @route   GET api/profile/user/:user_id
-// @desc    Get all user's profile
+// @desc    Get user's profile by user id
 // @access  Public
 router.get('/user/:user_id', async (req, res) => {
+
    try {
       const profile = await Profile.findOne({ user: req.params.user_id }).populate('user', ['avatar', 'name'])
       if (!profile) {
@@ -133,7 +134,8 @@ router.get('/user/:user_id', async (req, res) => {
 // @access  Private
 router.delete('/', auth, async (req, res) => {
    try {
-      // @todo-delete posts
+      // delete user post
+      await Post.deleteMany({ user: req.user.id })
       // delete profile
       await Profile.findOneAndRemove({ user: req.user.id })
       // delete user
@@ -202,7 +204,7 @@ router.delete('/experience/:exp_id', auth, async (req, res) => {
       }
       profile.experience.splice(removeIndex, 1)
       await profile.save()
-      res.json({ profile })
+      res.json(profile)
    } catch (err) {
       console.log(err)
       res.status(500).send('Server Error')
@@ -267,7 +269,7 @@ router.delete('/education/:edu_id', auth, async (req, res) => {
       }
       profile.education.splice(removeIndex, 1)
       await profile.save()
-      res.json({ profile })
+      res.json(profile)
    } catch (err) {
       console.log(err)
       res.status(500).send('Server Error')
@@ -286,12 +288,12 @@ router.get('/github/:username', (req, res) => {
       headers: { 'user-agent': 'node.js' }
    }
 
-   request(options, (error,respone, body) => {
-      if(error) {
+   request(options, (error, respone, body) => {
+      if (error) {
          console.log(err)
       }
-      if(respone.statusCode !== 200){
-         res.statusCode(404).json({msg: 'No Github profile found'})
+      if (respone.statusCode !== 200) {
+         res.statusCode(404).json({ msg: 'No Github profile found' })
       }
       res.json(JSON.parse(body))
    })

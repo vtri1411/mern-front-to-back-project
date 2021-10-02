@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const PostSchema = mongoose.Schema({
    user: {
-      type: String,
+      type: Schema.Types.ObjectId,
       ref: 'users'
    },
    text: {
@@ -50,5 +50,5 @@ const PostSchema = mongoose.Schema({
       default: Date.now
    }
 })
-
-module.exports = Post = mongoose.model('post', PostSchema)
+const Post = mongoose.model('post', PostSchema)
+module.exports = Post

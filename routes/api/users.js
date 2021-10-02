@@ -7,10 +7,10 @@ const config = require('config')
 const jwt = require('jsonwebtoken');
 const User = require('../../models/User')
 
-// @route POST api/users
-// @desc Test route
-// @access Public
 
+// @route   POST api/users
+// @desc    Create new User
+// @access  Public
 router.post(
    '/',
    check('name', 'Name is required').not().isEmpty(),
@@ -26,8 +26,7 @@ router.post(
          // get the user exists
          let user = await User.findOne({ email })
          if (user) {
-            return res.status(400)
-               .json({ errors: [{ msg: 'User has already existed' }] })
+            return res.status(400).json({ errors: [{ msg: 'User has already existed' }] })
          }
          // gravatar
          const avatar = gravata.url(email, {
